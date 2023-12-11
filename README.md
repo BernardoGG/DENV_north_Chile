@@ -1,13 +1,5 @@
 # Likelihood of the establishment of Dengue virus in northern Chile
 
-Bernardo Gutierrez<sup>1,2</sup>, Rhys P.D. Inward<sup>1</sup>, Simon Busch-Moreno<sup>1</sup>, Moritz U.G. Kraemer<sup>1,3,†</sup>
-
-1.	Department of Biology, University of Oxford, Oxford, UK
-2.	Colegio de Ciencias Biologicas y Ambientales, Universidad San Francisco de Quito USFQ, Quito, Ecuador
-3.	Pandemic Sciences Institute, University of Oxford, Oxford, UK
-
-This repository contains material for the exploratory analysis of human mobility from Chile and Dengue virus (DENV) genome data from South America to describe the historical patterns of viral spread, summarise the connectivity of the Arica and Tarapaca regions of Chile with other regional and global destinations, and explore likely drivers of the potential for sustained DENV transmission in north Chile.
-
 ## Repository structure and general notes
 The structure of this repository is shown below.  
 

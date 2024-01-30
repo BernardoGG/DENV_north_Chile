@@ -10,6 +10,7 @@ library(lubridate)
 library(stringr)
 library(patchwork)
 library(NatParksPalettes)
+library(RColorBrewer)
 library(ape)
 library(phylobase)
 
@@ -32,15 +33,13 @@ regions <- c("South America", "Central America", "North America",
              "Caribbean")
 serotypes <- c("DENV1", "DENV2", "DENV3", "DENV4")
 
-latam_palette <- NatParksPalettes$Acadia[1] |> unlist()
-names(latam_palette) <- latam
-
-regions_palette <- NatParksPalettes$Acadia[1] |> unlist()
-names(regions_palette) <- regions
-
 serotypes_palette <- NatParksPalettes$Triglav[1] |> unlist()
 serotypes_palette <- serotypes_palette[1:4]
 names(serotypes_palette) <- serotypes
+
+continental_americas_palette <- colorRampPalette(NatParksPalettes$Torres[1] |>
+                                                   unlist())(length(continental_americas))
+names(continental_americas_palette) <- continental_americas
 
 ## Import (deconstructed) phylogenetic trees and dictionaries ####
 # Dictionary for transitions between neighbouring countries
@@ -149,41 +148,19 @@ ggplot(plot_data_2) + geom_jitter(aes(x = import_type, y = count,
   theme(axis.text.y.right = element_text(color = "darkgrey"),
         axis.title.y.right = element_text(color = "darkgrey"))
 
-# Plot numbers of international imports into Colombia by serotype (example)
+# Plot numbers of international imports into specific countries
+example_country <- "Colombia"
+
 plot_data_3 <- denv_americas |>
-  mutate(key = paste0(denv_americas_intl$head_country,
-                      denv_americas_intl$tail_country)) |>
-  group_by(import_type, serotype, key) |>
-  summarise(count = n()) |>
-  group_by(import_type, serotype) |>
-  mutate(sum = sum(count))
+  filter(tail_country == example_country) |>
+  group_by(import_type, serotype, head_country) |>
+  summarise(count = n())
 
-ggplot(plot_data_3) + geom_jitter(aes(x = import_type, y = count, group = serotype)) +
-  geom_col(aes(x = import_type, y = sum/3000), alpha = 0.2) +
-  facet_wrap(vars(serotype))
-
-
-################################# Sandbox ######################################
-fake_dict <- data.frame(origin = c("country_A", "country_B", "country_C",
-                                   "country_D", "country_B", "country_C",
-                                   "country_D", "country_E"),
-                        destination = c("country_B", "country_C", "country_D",
-                                        "country_E", "country_A", "country_B",
-                                        "country_C", "country_D"))
-
-denv_americas_intl <- data.frame(head_country = sample(c("country_A", "country_B",
-                                                      "country_C","country_D",
-                                                      "country_E"),
-                                                    500, replace = TRUE),
-                                 tail_country = sample(c("country_A", "country_B",
-                                                      "country_C","country_D",
-                                                      "country_E"),
-                                                    500, replace = TRUE),
-                                 tail_date = rnorm(500, 2020.3, 1),
-                                 serotype = sample(c("DENV 1", "DENV 2",
-                                                     "DENV 3","DENV 4"),
-                                                   500, replace = TRUE)) |>
-  filter(head_country != tail_country)
-
-# Call the function with your tree
-country_annotations_phytools <- extract_country_annotations_phytools(denv1_americas)
+ggplot(plot_data_3) +
+  geom_col(aes(x = count, y = import_type, fill = head_country),
+           position = position_dodge2(width = 0.9, preserve = "single")) +
+  facet_wrap(vars(serotype), ncol = 1) +
+  scale_fill_manual(values = continental_americas_palette) +
+  labs(y = "Import type", x = "No. of inferred imports",
+       fill = "Source country", title = paste0("DENV imports to ", example_country)) +
+  theme_minimal()

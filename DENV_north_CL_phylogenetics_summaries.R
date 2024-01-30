@@ -104,30 +104,8 @@ denv_americas <- denv_americas_intl |> filter(head_country %in%
                                                 continental_americas)
 
 ### Plots
-# Plot numbers of international imports by type
-plot_data_1 <- denv_americas |>
-  mutate(key = paste0(denv_americas$head_country,
-                      denv_americas$tail_country)) |>
-  group_by(import_type, serotype, key) |>
-  summarise(count = n()) |>
-#  summarise(proportion = n()) #TODO add proportion of movements from serotype tip numbers
-  group_by(import_type) |>
-  mutate(sum = sum(count))
-
-ggplot(plot_data_1) + geom_jitter(aes(x = import_type, y = count, color = serotype),
-                         size = 2) +
-  geom_col(aes(x = import_type, y = sum/700), alpha = 0.2, fill = "darkgrey") +
-  scale_y_continuous(sec.axis = sec_axis(~ . *max(plot_data_1$sum)/max(plot_data_1$count),
-                                         name = "Total number of inferred transitions")) +
-  scale_color_manual(values = serotypes_palette) +
-  labs(x = "Import type", y = "No. of movements per country pair",
-         color = "Serotype") +
-  theme_minimal() +
-  theme(axis.text.y.right = element_text(color = "darkgrey"),
-        axis.title.y.right = element_text(color = "darkgrey"))
-
 # Plot numbers of international imports by serotype
-plot_data_2 <- denv_americas |>
+plot_data_1 <- denv_americas |>
   mutate(key = paste0(denv_americas$head_country,
                       denv_americas$tail_country)) |>
   group_by(import_type, serotype, key) |>
@@ -135,7 +113,7 @@ plot_data_2 <- denv_americas |>
   group_by(import_type, serotype) |>
   mutate(sum = sum(count))
 
-ggplot(plot_data_2) + geom_jitter(aes(x = import_type, y = count,
+ggplot(plot_data_1) + geom_jitter(aes(x = import_type, y = count,
                                       group = serotype, color = serotype)) +
   geom_col(aes(x = import_type, y = sum/100), alpha = 0.2, fill = "darkgrey") +
   scale_y_continuous(sec.axis = sec_axis(~ . *max(plot_data_2$sum)/max(plot_data_2$count),
@@ -151,12 +129,12 @@ ggplot(plot_data_2) + geom_jitter(aes(x = import_type, y = count,
 # Plot numbers of international imports into specific countries
 example_country <- "Colombia"
 
-plot_data_3 <- denv_americas |>
+plot_data_2 <- denv_americas |>
   filter(tail_country == example_country) |>
   group_by(import_type, serotype, head_country) |>
   summarise(count = n())
 
-ggplot(plot_data_3) +
+ggplot(plot_data_2) +
   geom_col(aes(x = count, y = import_type, fill = head_country),
            position = position_dodge2(width = 0.9, preserve = "single")) +
   facet_wrap(vars(serotype), ncol = 1) +
